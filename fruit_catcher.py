@@ -44,29 +44,21 @@ class Game:
         
     def load_assets(self):
         self.font = pygame.font.Font(None, 36)
-        self.background = self.create_background()
-        self.last_fruit = 0
-        self.fruit_delay = 1000
-        self.last_bomb = 0
-        self.bomb_delay = 2000
-        self.spawn_delay = 2000
-        self.last_spawn = pygame.time.get_ticks()
+        try:
+            self.background = pygame.image.load("images/background.png").convert()
+            self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        except pygame.error as e:
+            print("Не удалось загрузить фоновое изображение:", e)
+            self.background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+            self.background.fill((20, 20, 30))  # fallback background
+            self.last_fruit = 0
+            self.fruit_delay = 1000
+            self.last_bomb = 0
+            self.bomb_delay = 2000
+            self.spawn_delay = 2000
+            self.last_spawn = pygame.time.get_ticks()
         
-    def create_background(self):
-        tile_size = 50
-        rows = SCREEN_HEIGHT // tile_size + 1
-        cols = SCREEN_WIDTH // tile_size + 1
-
-        grid = np.zeros((rows, cols, 3), dtype=np.uint8)
-        for i in range(rows):
-            for j in range(cols):
-                if (i + j) % 2 == 0:
-                    grid[i, j] = [30, 30, 40]
-                else:
-                    grid[i, j] = [20, 20, 30]
-
-        background = pygame.surfarray.make_surface(grid)
-        return pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    
     
     def new_game(self):
         self.score = 0
