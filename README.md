@@ -58,7 +58,7 @@ A simple arcade-style game built with Python and Pygame where you catch falling 
 - ❤️ Healing: Heart sprite 
   - Cath these to heal a life (+1 life)
   - Maximum number of lives is limited to 3
-  - If the user has the maximum number of lives, no hearts are dropped.
+  - If the user has the maximum number of lives, no hearts are dropped
 - 🔥 **Combo System**:
   - Catch the same fruit type consecutively to build combos
   - 3+ consecutive same fruits = bonus points (20, 40, 60+ bonus)
