@@ -5,25 +5,18 @@ import numpy as np
 from enum import Enum
 from sprites import Player, Fruit, Bomb, WHITE, BLACK, RED, GREEN, BLUE, Heart
 
-# Initialize Pygame
 pygame.init()
 pygame.mixer.init()
-
-# Game constants
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 FPS = 60
 TITLE = "Fruit Catcher"
-
-# Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
-
-# Game states
 class GameState(Enum):
     MENU = 0
     PLAYING = 1
@@ -42,62 +35,52 @@ class Game:
         self.fruits = pygame.sprite.Group()
         self.bombs = pygame.sprite.Group()
         self.hearts = pygame.sprite.Group()
-        
+
         self.combo_count = 0
         self.last_fruit_type = None
         self.combo_bonus = 0
-        
-        # Initialize game assets
+
         self.load_assets()
         
     def load_assets(self):
         self.font = pygame.font.Font(None, 36)
-        # Generate a simple tilemap background
         self.background = self.create_background()
         self.last_fruit = 0
-        self.fruit_delay = 1000  # milliseconds
+        self.fruit_delay = 1000
         self.last_bomb = 0
-        self.bomb_delay = 2000  # milliseconds
-        self.spawn_delay = 2000  # Initial spawn delay (decreases over time)
+        self.bomb_delay = 2000
+        self.spawn_delay = 2000
         self.last_spawn = pygame.time.get_ticks()
         
     def create_background(self):
-        # Create a simple tiled background using NumPy
         tile_size = 50
         rows = SCREEN_HEIGHT // tile_size + 1
         cols = SCREEN_WIDTH // tile_size + 1
-        
-        # Create a grid with alternating colors
+
         grid = np.zeros((rows, cols, 3), dtype=np.uint8)
         for i in range(rows):
             for j in range(cols):
                 if (i + j) % 2 == 0:
-                    grid[i, j] = [30, 30, 40]  # Dark gray
+                    grid[i, j] = [30, 30, 40]
                 else:
-                    grid[i, j] = [20, 20, 30]   # Even darker gray
-        
-        # Convert to a surface
+                    grid[i, j] = [20, 20, 30]
+
         background = pygame.surfarray.make_surface(grid)
         return pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
     
     def new_game(self):
-        # Reset game state
         self.score = 0
         self.lives = 3
         self.all_sprites.empty()
         self.fruits.empty()
         self.bombs.empty()
-        
-        # Reset combo system
+
         self.combo_count = 0
         self.last_fruit_type = None
         self.combo_bonus = 0
-        
-        # Create player
+
         self.player = Player(self)
         self.all_sprites.add(self.player)
-        
-        # Reset timers
         self.last_fruit = pygame.time.get_ticks()
         self.last_bomb = pygame.time.get_ticks()
         self.last_spawn = pygame.time.get_ticks()
@@ -106,7 +89,6 @@ class Game:
         self.state = GameState.PLAYING
     
     def run(self):
-        # Game loop
         while self.running:
             self.clock.tick(FPS)
             self.events()
@@ -154,31 +136,24 @@ class Game:
     def update(self):
         if self.state == GameState.PLAYING:
             now = pygame.time.get_ticks()
-            
-            # Spawn fruits and bombs
+
             if now - self.last_spawn > self.spawn_delay:
                 self.last_spawn = now
-                # Gradually increase spawn rate
                 self.spawn_delay = max(500, self.spawn_delay - 20)
 
-                # Randomly decide to spawn fruit or bomb
                 if random.random() < 0.40:  # 40% chance for bomb
                     self.spawn_bomb()
-                else:  # 40% chance for bomb
+                else:
                     fruit_probability = random.random()
 
                     if fruit_probability < 0.9:
                         self.spawn_fruit()
                     else:
                         self.spawn_heart()
-            
-            # Update all sprites
+
             self.all_sprites.update()
-            
-            # Check for collisions
+
             self.check_collisions()
-            
-            # Check game over condition
             if self.lives <= 0:
                 self.state = GameState.GAME_OVER
     
@@ -198,33 +173,27 @@ class Game:
         self.bombs.add(bomb)
     
     def check_collisions(self):
-        # Check fruit catches
         hits = pygame.sprite.spritecollide(self.player, self.fruits, True)
         for hit in hits:
             points = 10
-            
-            # Combo system logic
+
             if self.last_fruit_type == hit.fruit_type:
                 self.combo_count += 1
             else:
                 self.combo_count = 1
                 self.last_fruit_type = hit.fruit_type
-            
-            # Award combo bonus for 3+ consecutive same fruits
+
             if self.combo_count >= 3:
-                bonus = (self.combo_count - 2) * 20  # 20, 40, 60, etc.
+                bonus = (self.combo_count - 2) * 20
                 points += bonus
                 self.combo_bonus = bonus
             else:
                 self.combo_bonus = 0
             
             self.score += points
-            # Play sound here if we had one
-        
-        # Check bomb hits
+
         hits = pygame.sprite.spritecollide(self.player, self.bombs, True)
         for hit in hits:
-            # Reset combo on bomb hit
             self.combo_count = 0
             self.last_fruit_type = None
             self.combo_bonus = 0
@@ -233,14 +202,10 @@ class Game:
             if self.lives <= 0:
                 self.state = GameState.GAME_OVER
                 return
-            # Play explosion sound here if we had one
 
-        # Check hearts
         hits = pygame.sprite.spritecollide(self.player, self.hearts, True)
         for hit in hits:
-            # Reset combo on bomb hit
             self.combo_count = 0
-            self.last_fruit_type = None
 
             self.lives += 1
     
@@ -266,33 +231,26 @@ class Game:
         self.screen.blit(quit_text, (SCREEN_WIDTH//2 - quit_text.get_width()//2, SCREEN_HEIGHT//2 + 50))
     
     def draw_playing(self):
-        # Draw background
         self.screen.blit(self.background, (0, 0))
-        
-        # Draw all sprites
+
         self.all_sprites.draw(self.screen)
-        
-        # Draw HUD
         score_text = self.font.render(f"Score: {self.score}", True, WHITE)
         lives_text = self.font.render(f"Lives: {self.lives}", True, WHITE)
         restart_text = self.font.render("Press R to restart", True, WHITE)
-        
-        # Combo display
+
         if self.combo_count >= 2:
             combo_color = YELLOW if self.combo_count >= 3 else WHITE
             combo_text = self.font.render(f"Combo: {self.combo_count}x", True, combo_color)
             if self.combo_bonus > 0:
                 bonus_text = self.font.render(f"+{self.combo_bonus} bonus!", True, YELLOW)
-        
-        # Add semi-transparent background for better text visibility
+
         score_bg_height = 100 if self.combo_count >= 2 else 70
         score_bg = pygame.Surface((200, score_bg_height), pygame.SRCALPHA)
-        score_bg.fill((0, 0, 0, 128))  # Semi-transparent black
+        score_bg.fill((0, 0, 0, 128))
         self.screen.blit(score_bg, (0, 0))
         self.screen.blit(score_text, (10, 10))
         self.screen.blit(restart_text, (10, 40))
-        
-        # Draw combo info if active
+
         if self.combo_count >= 2:
             self.screen.blit(combo_text, (10, 70))
         
@@ -300,8 +258,6 @@ class Game:
         lives_bg.fill((0, 0, 0, 128))
         self.screen.blit(lives_bg, (SCREEN_WIDTH - 150, 0))
         self.screen.blit(lives_text, (SCREEN_WIDTH - 140, 10))
-        
-        # Show bonus text temporarily in center if earned
         if self.combo_bonus > 0:
             bonus_text = self.font.render(f"+{self.combo_bonus} COMBO BONUS!", True, YELLOW)
             bonus_x = SCREEN_WIDTH//2 - bonus_text.get_width()//2
@@ -321,7 +277,5 @@ class Game:
         self.screen.blit(score_text, (SCREEN_WIDTH//2 - score_text.get_width()//2, SCREEN_HEIGHT//2))
         self.screen.blit(restart_direct, (SCREEN_WIDTH//2 - restart_direct.get_width()//2, SCREEN_HEIGHT//2 + 50))
         self.screen.blit(restart_menu, (SCREEN_WIDTH//2 - restart_menu.get_width()//2, SCREEN_HEIGHT//2 + 90))
-
-# Create the game object
 g = Game()
 g.run()
