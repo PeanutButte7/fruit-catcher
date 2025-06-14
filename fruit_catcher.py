@@ -129,11 +129,15 @@ class Game:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.state = GameState.MENU
+            elif event.key == pygame.K_r:
+                self.new_game()
     
     def events_game_over(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 self.state = GameState.MENU
+            elif event.key == pygame.K_SPACE:
+                self.new_game()
             elif event.key == pygame.K_ESCAPE:
                 self.running = False
     
@@ -220,12 +224,14 @@ class Game:
         # Draw HUD
         score_text = self.font.render(f"Score: {self.score}", True, WHITE)
         lives_text = self.font.render(f"Lives: {self.lives}", True, WHITE)
+        restart_text = self.font.render("Press R to restart", True, WHITE)
         
         # Add semi-transparent background for better text visibility
-        score_bg = pygame.Surface((200, 40), pygame.SRCALPHA)
+        score_bg = pygame.Surface((200, 70), pygame.SRCALPHA)  # Increased height for restart text
         score_bg.fill((0, 0, 0, 128))  # Semi-transparent black
         self.screen.blit(score_bg, (0, 0))
         self.screen.blit(score_text, (10, 10))
+        self.screen.blit(restart_text, (10, 40))  # Position under the score
         
         lives_bg = pygame.Surface((150, 40), pygame.SRCALPHA)
         lives_bg.fill((0, 0, 0, 128))
@@ -235,11 +241,13 @@ class Game:
     def draw_game_over(self):
         game_over = self.font.render("GAME OVER", True, RED)
         score_text = self.font.render(f"Final Score: {self.score}", True, WHITE)
-        restart = self.font.render("Press ENTER to return to menu", True, WHITE)
+        restart_direct = self.font.render("Press SPACE to restart", True, YELLOW)
+        restart_menu = self.font.render("Press ENTER to return to menu", True, WHITE)
         
         self.screen.blit(game_over, (SCREEN_WIDTH//2 - game_over.get_width()//2, SCREEN_HEIGHT//3))
         self.screen.blit(score_text, (SCREEN_WIDTH//2 - score_text.get_width()//2, SCREEN_HEIGHT//2))
-        self.screen.blit(restart, (SCREEN_WIDTH//2 - restart.get_width()//2, SCREEN_HEIGHT//2 + 50))
+        self.screen.blit(restart_direct, (SCREEN_WIDTH//2 - restart_direct.get_width()//2, SCREEN_HEIGHT//2 + 50))
+        self.screen.blit(restart_menu, (SCREEN_WIDTH//2 - restart_menu.get_width()//2, SCREEN_HEIGHT//2 + 90))
 
 # Create the game object
 g = Game()
