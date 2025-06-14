@@ -20,7 +20,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.x -= self.speed
         if keys[pygame.K_RIGHT]:
             self.rect.x += self.speed
-            
+
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.right > self.game.screen.get_width():
@@ -30,13 +30,13 @@ class Fruit(pygame.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
         self.game = game
-        
+
         if not hasattr(game, 'fruit_sheet'):
             try:
                 game.fruit_sheet = Spritesheet(os.path.join('images', 'fruit_spritesheet.png'))
             except:
                 game.fruit_sheet = None
-        
+
         if game.fruit_sheet:
             self.image, self.fruit_type = game.fruit_sheet.get_random_fruit()
         else:
@@ -69,6 +69,36 @@ class Bomb(pygame.sprite.Sprite):
     def update(self):
         self.rect.y += self.speedy
         
+        # If it falls off the bottom
+        if self.rect.top > self.game.screen.get_height():
+            self.kill()
+
+
+class Heart(pygame.sprite.Sprite):
+    def __init__(self, game):
+        super().__init__()
+        self.game = game
+
+        if not hasattr(game, 'heart'):
+            try:
+                game.heart = Spritesheet(os.path.join('images', 'heart.png'))
+            except:
+                game.heart = None
+
+        if game.heart:
+            self.image = game.heart.get_image(0, 0, 16, 16, 2)
+        else:
+            self.image = pygame.Surface((30, 30))
+            self.image.fill(GREEN)
+            self.fruit_type = 0
+
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(self.game.screen.get_width() - self.rect.width)
+        self.rect.y = random.randrange(-100, -40)
+        self.speedy = random.randrange(3, 8) # Make the heart a bit faster
+
+    def update(self):
+        self.rect.y += self.speedy
         # If it falls off the bottom
         if self.rect.top > self.game.screen.get_height():
             self.kill()

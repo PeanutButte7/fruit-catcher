@@ -7,6 +7,7 @@ A simple arcade-style game built with Python and Pygame where you catch falling 
 - Catch fruits to score points
 - **Combo Bonus System**: Catch the same fruit type 3 times in a row for bonus points!
 - Avoid bombs that reduce your lives
+- Catch heart to increase your lives score
 - Increasing difficulty as you play
 - High score tracking
 - Simple and intuitive controls
@@ -54,6 +55,7 @@ A simple arcade-style game built with Python and Pygame where you catch falling 
 - 🧺 Basket: Your character at the bottom of the screen (blue rectangle)
 - 🍎 Fruits: Various fruit sprites (13 different types) - catch these for points (10 points each)
 - 💣 Bombs: Red rectangles - avoid these or lose a life
+- ❤️ Healing: Heart sprite - cath this to heal a life (+1 life)
 - 🔥 **Combo System**:
   - Catch the same fruit type consecutively to build combos
   - 3+ consecutive same fruits = bonus points (20, 40, 60+ bonus)

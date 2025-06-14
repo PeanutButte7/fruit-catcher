@@ -3,7 +3,7 @@ import sys
 import random
 import numpy as np
 from enum import Enum
-from sprites import Player, Fruit, Bomb, WHITE, BLACK, RED, GREEN, BLUE
+from sprites import Player, Fruit, Bomb, WHITE, BLACK, RED, GREEN, BLUE, Heart
 
 # Initialize Pygame
 pygame.init()
@@ -41,6 +41,7 @@ class Game:
         self.all_sprites = pygame.sprite.Group()
         self.fruits = pygame.sprite.Group()
         self.bombs = pygame.sprite.Group()
+        self.hearts = pygame.sprite.Group()
         
         self.combo_count = 0
         self.last_fruit_type = None
@@ -159,12 +160,17 @@ class Game:
                 self.last_spawn = now
                 # Gradually increase spawn rate
                 self.spawn_delay = max(500, self.spawn_delay - 20)
-                
+
                 # Randomly decide to spawn fruit or bomb
-                if random.random() < 0.60:  # 60% chance for fruit
-                    self.spawn_fruit()
-                else:  # 40% chance for bomb
+                if random.random() < 0.40:  # 40% chance for bomb
                     self.spawn_bomb()
+                else:  # 40% chance for bomb
+                    fruit_probability = random.random()
+
+                    if fruit_probability < 0.9:
+                        self.spawn_fruit()
+                    else:
+                        self.spawn_heart()
             
             # Update all sprites
             self.all_sprites.update()
@@ -180,7 +186,12 @@ class Game:
         fruit = Fruit(self)
         self.all_sprites.add(fruit)
         self.fruits.add(fruit)
-    
+
+    def spawn_heart(self):
+        heart = Heart(self)
+        self.all_sprites.add(heart)
+        self.hearts.add(heart)
+
     def spawn_bomb(self):
         bomb = Bomb(self)
         self.all_sprites.add(bomb)
@@ -223,6 +234,15 @@ class Game:
                 self.state = GameState.GAME_OVER
                 return
             # Play explosion sound here if we had one
+
+        # Check hearts
+        hits = pygame.sprite.spritecollide(self.player, self.hearts, True)
+        for hit in hits:
+            # Reset combo on bomb hit
+            self.combo_count = 0
+            self.last_fruit_type = None
+
+            self.lives += 1
     
     def draw(self):
         self.screen.fill(BLACK)
