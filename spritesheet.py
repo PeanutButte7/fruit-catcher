@@ -40,4 +40,5 @@ class Spritesheet:
             col = fruit_index - 10
         
         # Get the fruit sprite (16x16)
-        return self.get_image(col * 16, row * 16, 16, 16, 2)  # Scale 2x for better visibility
+        image = self.get_image(col * 16, row * 16, 16, 16, 2)  # Scale 2x for better visibility
+        return image, fruit_index  # Return both image and fruit type

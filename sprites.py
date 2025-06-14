@@ -8,7 +8,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.game = game
         self.image = pygame.Surface((80, 40))
-        self.image.fill(BLUE)  # Temporary color
+        self.image.fill(BLUE)
         self.rect = self.image.get_rect()
         self.rect.centerx = self.game.screen.get_rect().centerx
         self.rect.bottom = self.game.screen.get_rect().bottom - 20
@@ -21,7 +21,6 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_RIGHT]:
             self.rect.x += self.speed
             
-        # Keep player on screen
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.right > self.game.screen.get_width():
@@ -32,20 +31,18 @@ class Fruit(pygame.sprite.Sprite):
         super().__init__()
         self.game = game
         
-        # Load spritesheet if not already loaded
         if not hasattr(game, 'fruit_sheet'):
             try:
                 game.fruit_sheet = Spritesheet(os.path.join('images', 'fruit_spritesheet.png'))
             except:
-                # Fallback to colored rectangle if spritesheet fails to load
                 game.fruit_sheet = None
         
-        # Get a random fruit sprite or fallback to colored rectangle
         if game.fruit_sheet:
-            self.image = game.fruit_sheet.get_random_fruit()
+            self.image, self.fruit_type = game.fruit_sheet.get_random_fruit()
         else:
             self.image = pygame.Surface((30, 30))
             self.image.fill(GREEN)
+            self.fruit_type = 0 
         
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(self.game.screen.get_width() - self.rect.width)

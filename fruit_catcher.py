@@ -42,6 +42,10 @@ class Game:
         self.fruits = pygame.sprite.Group()
         self.bombs = pygame.sprite.Group()
         
+        self.combo_count = 0
+        self.last_fruit_type = None
+        self.combo_bonus = 0
+        
         # Initialize game assets
         self.load_assets()
         
@@ -82,6 +86,11 @@ class Game:
         self.all_sprites.empty()
         self.fruits.empty()
         self.bombs.empty()
+        
+        # Reset combo system
+        self.combo_count = 0
+        self.last_fruit_type = None
+        self.combo_bonus = 0
         
         # Create player
         self.player = Player(self)
@@ -181,12 +190,34 @@ class Game:
         # Check fruit catches
         hits = pygame.sprite.spritecollide(self.player, self.fruits, True)
         for hit in hits:
-            self.score += 10
+            points = 10
+            
+            # Combo system logic
+            if self.last_fruit_type == hit.fruit_type:
+                self.combo_count += 1
+            else:
+                self.combo_count = 1
+                self.last_fruit_type = hit.fruit_type
+            
+            # Award combo bonus for 3+ consecutive same fruits
+            if self.combo_count >= 3:
+                bonus = (self.combo_count - 2) * 20  # 20, 40, 60, etc.
+                points += bonus
+                self.combo_bonus = bonus
+            else:
+                self.combo_bonus = 0
+            
+            self.score += points
             # Play sound here if we had one
         
         # Check bomb hits
         hits = pygame.sprite.spritecollide(self.player, self.bombs, True)
         for hit in hits:
+            # Reset combo on bomb hit
+            self.combo_count = 0
+            self.last_fruit_type = None
+            self.combo_bonus = 0
+            
             self.lives -= 1
             if self.lives <= 0:
                 self.state = GameState.GAME_OVER
@@ -226,17 +257,39 @@ class Game:
         lives_text = self.font.render(f"Lives: {self.lives}", True, WHITE)
         restart_text = self.font.render("Press R to restart", True, WHITE)
         
+        # Combo display
+        if self.combo_count >= 2:
+            combo_color = YELLOW if self.combo_count >= 3 else WHITE
+            combo_text = self.font.render(f"Combo: {self.combo_count}x", True, combo_color)
+            if self.combo_bonus > 0:
+                bonus_text = self.font.render(f"+{self.combo_bonus} bonus!", True, YELLOW)
+        
         # Add semi-transparent background for better text visibility
-        score_bg = pygame.Surface((200, 70), pygame.SRCALPHA)  # Increased height for restart text
+        score_bg_height = 100 if self.combo_count >= 2 else 70
+        score_bg = pygame.Surface((200, score_bg_height), pygame.SRCALPHA)
         score_bg.fill((0, 0, 0, 128))  # Semi-transparent black
         self.screen.blit(score_bg, (0, 0))
         self.screen.blit(score_text, (10, 10))
-        self.screen.blit(restart_text, (10, 40))  # Position under the score
+        self.screen.blit(restart_text, (10, 40))
+        
+        # Draw combo info if active
+        if self.combo_count >= 2:
+            self.screen.blit(combo_text, (10, 70))
         
         lives_bg = pygame.Surface((150, 40), pygame.SRCALPHA)
         lives_bg.fill((0, 0, 0, 128))
         self.screen.blit(lives_bg, (SCREEN_WIDTH - 150, 0))
         self.screen.blit(lives_text, (SCREEN_WIDTH - 140, 10))
+        
+        # Show bonus text temporarily in center if earned
+        if self.combo_bonus > 0:
+            bonus_text = self.font.render(f"+{self.combo_bonus} COMBO BONUS!", True, YELLOW)
+            bonus_x = SCREEN_WIDTH//2 - bonus_text.get_width()//2
+            bonus_y = SCREEN_HEIGHT//2 - 100
+            bonus_bg = pygame.Surface((bonus_text.get_width() + 20, 40), pygame.SRCALPHA)
+            bonus_bg.fill((0, 0, 0, 160))
+            self.screen.blit(bonus_bg, (bonus_x - 10, bonus_y - 5))
+            self.screen.blit(bonus_text, (bonus_x, bonus_y))
     
     def draw_game_over(self):
         game_over = self.font.render("GAME OVER", True, RED)
