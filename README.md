@@ -5,10 +5,13 @@ A simple arcade-style game built with Python and Pygame where you catch falling 
 ## Features
 
 - Catch fruits to score points
+- **Combo Bonus System**: Catch the same fruit type 3 times in a row for bonus points!
 - Avoid bombs that reduce your lives
+- Catch heart to increase your lives score
 - Increasing difficulty as you play
 - High score tracking
 - Simple and intuitive controls
+- Instant restart functionality
 
 ## Requirements
 
@@ -27,6 +30,7 @@ A simple arcade-style game built with Python and Pygame where you catch falling 
 ## How to Play
 
 1. Run the game:
+
    ```
    python fruit_catcher.py
    ```
@@ -40,24 +44,37 @@ A simple arcade-style game built with Python and Pygame where you catch falling 
 
 - LEFT ARROW: Move basket left
 - RIGHT ARROW: Move basket right
+- R: Restart game instantly (during gameplay)
 - ESC: Return to main menu (during game)
-- ENTER: Start game or confirm selection
+- ENTER: Start game or return to menu (from game over)
+- SPACE: Restart game directly (from game over screen)
 - ESC: Quit game (from main menu)
 
 ## Game Elements
 
-- 🧺 Basket: Your character at the bottom of the screen
-- 🍎 Fruits: Green squares (for now) - catch these for points
-- 💣 Bombs: Red rectangles (for now) - avoid these or lose a life
+- 🧺 Basket: Your character at the bottom of the screen (blue rectangle)
+- 🍎 Fruits: Various fruit sprites (13 different types) - catch these for points (10 points each)
+- 💣 Bombs: Red rectangles - avoid these or lose a life
+- ❤️ Healing: Heart sprite 
+  - Cath these to heal a life (+1 life)
+  - Maximum number of lives is limited to 3
+  - If the user has the maximum number of lives, no hearts are dropped
+- 🔥 **Combo System**:
+  - Catch the same fruit type consecutively to build combos
+  - 3+ consecutive same fruits = bonus points (20, 40, 60+ bonus)
+  - Combo counter shows in top-left when active (yellow when 3+)
+  - Hitting a bomb resets your combo
 
 ## Future Improvements
 
-- Add actual fruit and bomb sprites
-- Include sound effects and background music
-- Add different types of fruits with different point values
+- ✅ ~~Add actual fruit and bomb sprites~~ (Implemented with spritesheet)
+- ✅ ~~Add different types of fruits with different point values~~ (Implemented with combo system)
+- ✅ Include sound effects and background music
 - Implement power-ups and special abilities
 - Add particle effects for catching fruits and explosions
 - Create different levels with increasing difficulty
+- Add visual effects for combo achievements
+- Implement high score persistence
 
 ## Credits
 
