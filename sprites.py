@@ -51,7 +51,6 @@ class Fruit(pygame.sprite.Sprite):
         
     def update(self):
         self.rect.y += self.speedy
-        # If it falls off the bottom
         if self.rect.top > self.game.screen.get_height():
             self.kill()
 
@@ -59,21 +58,18 @@ class Bomb(pygame.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
         self.game = game
-        self.image = pygame.Surface((30, 30))  # Same size as fruit
-        self.image.fill(RED)  # Temporary color
+        self.image = pygame.Surface((30, 30))
+        self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(self.game.screen.get_width() - self.rect.width)
         self.rect.y = random.randrange(-100, -40)
-        self.speedy = random.randrange(3, 8)  # Same speed range as fruit
+        self.speedy = random.randrange(3, 8)
         
     def update(self):
         self.rect.y += self.speedy
         
-        # If it falls off the bottom
         if self.rect.top > self.game.screen.get_height():
             self.kill()
-
-# Define colors here for now (will be moved to a config file later)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)

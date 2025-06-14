@@ -3,7 +3,6 @@ import random
 
 class Spritesheet:
     def __init__(self, filename):
-        """Load the spritesheet."""
         try:
             self.sheet = pygame.image.load(filename).convert_alpha()
         except pygame.error as e:
@@ -11,12 +10,8 @@ class Spritesheet:
             raise SystemExit(e)
     
     def get_image(self, x, y, width, height, scale=2):
-        """Extract a single image from the spritesheet."""
-        # Create a new surface
         image = pygame.Surface((width, height), pygame.SRCALPHA)
-        # Copy the sprite from the sheet to the new surface
         image.blit(self.sheet, (0, 0), (x, y, width, height))
-        # Scale the image if needed
         if scale != 1:
             new_width = int(width * scale)
             new_height = int(height * scale)
@@ -24,21 +19,14 @@ class Spritesheet:
         return image
     
     def get_random_fruit(self):
-        """Get a random fruit sprite from the spritesheet."""
-        # The spritesheet is 80x48 with 16x16 tiles (5 columns, 3 rows)
-        # The last two columns in the last row are empty, so we skip them
-        
-        # Total fruits available: (5 columns * 2 rows) + 3 fruits in last row = 13 fruits
         fruit_index = random.randint(0, 12)
         
-        # Calculate row and column
-        if fruit_index < 10:  # First two full rows (10 fruits)
+        if fruit_index < 10:
             row = fruit_index // 5
             col = fruit_index % 5
-        else:  # First three fruits in last row
+        else:
             row = 2
             col = fruit_index - 10
         
-        # Get the fruit sprite (16x16)
-        image = self.get_image(col * 16, row * 16, 16, 16, 2)  # Scale 2x for better visibility
-        return image, fruit_index  # Return both image and fruit type
+        image = self.get_image(col * 16, row * 16, 16, 16, 2)
+        return image, fruit_index
