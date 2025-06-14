@@ -143,6 +143,8 @@ class Game:
 
                 if random.random() < 0.40:  # 40% chance for bomb
                     self.spawn_bomb()
+                elif self.lives == 3:
+                    self.spawn_fruit()
                 else:
                     fruit_probability = random.random()
 
@@ -207,7 +209,8 @@ class Game:
         for hit in hits:
             self.combo_count = 0
 
-            self.lives += 1
+            if self.lives < 5:
+                self.lives += 1
     
     def draw(self):
         self.screen.fill(BLACK)
