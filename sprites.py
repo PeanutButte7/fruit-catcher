@@ -7,8 +7,10 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
         self.game = game
-        self.image = pygame.Surface((80, 40))
-        self.image.fill(BLUE)
+
+        image = pygame.image.load(os.path.join("images", "basket.png"))
+        self.image = pygame.transform.scale(image, (80, 80))
+
         self.rect = self.image.get_rect()
         self.rect.centerx = self.game.screen.get_rect().centerx
         self.rect.bottom = self.game.screen.get_rect().bottom - 20
