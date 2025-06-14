@@ -69,7 +69,7 @@ A simple arcade-style game built with Python and Pygame where you catch falling 
 
 - ✅ ~~Add actual fruit and bomb sprites~~ (Implemented with spritesheet)
 - ✅ ~~Add different types of fruits with different point values~~ (Implemented with combo system)
-- Include sound effects and background music
+- ✅ Include sound effects and background music
 - Implement power-ups and special abilities
 - Add particle effects for catching fruits and explosions
 - Create different levels with increasing difficulty
