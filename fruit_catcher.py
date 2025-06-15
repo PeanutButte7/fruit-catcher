@@ -45,9 +45,14 @@ class Game:
         self.combo_count = 0
         self.last_fruit_type = None
         self.combo_bonus = 0
+        self.combo_bonus_time = 0
 
         self.explosion_frames = load_explosion_frames("images/explosion.png", 64, 32)
         self.load_assets()
+        
+        # Initialize player
+        self.player = Player(self)
+        self.all_sprites.add(self.player)
 
     def load_assets(self):
         self.font = pygame.font.Font(None, 36)
@@ -148,7 +153,7 @@ class Game:
             if now - self.last_spawn > self.spawn_delay:
                 self.last_spawn = now
                 self.spawn_delay = max(500, self.spawn_delay - 20)
-                if random.random() < 0.40:
+                if random.random() < 0.2:
                     self.spawn_bomb()
                 elif self.lives == 3:
                     self.spawn_fruit()
@@ -192,6 +197,7 @@ class Game:
                 bonus = (self.combo_count - 2) * 20
                 points += bonus
                 self.combo_bonus = bonus
+                self.combo_bonus_time = pygame.time.get_ticks() 
             else:
                 self.combo_bonus = 0
             self.score += points
@@ -214,37 +220,55 @@ class Game:
 
     def draw(self):
         self.screen.blit(self.background, (0, 0))
-        self.all_sprites.draw(self.screen)
-        self.explosions.draw(self.screen)
+        
+        if self.state == GameState.PLAYING:
+            self.all_sprites.draw(self.screen)
+            self.explosions.draw(self.screen)
 
-        score_text = self.font.render(f"Score: {self.score}", True, WHITE)
-        lives_text = self.font.render(f"Lives: {self.lives}", True, WHITE)
-        restart_text = self.font.render("Press R to restart", True, WHITE)
+            score_text = self.font.render(f"Score: {self.score}", True, WHITE)
+            lives_text = self.font.render(f"Lives: {self.lives}", True, WHITE)
+            restart_text = self.font.render("Press R to restart", True, WHITE)
 
-        score_bg_height = 100 if self.combo_count >= 2 else 70
-        score_bg = pygame.Surface((220, score_bg_height), pygame.SRCALPHA)
-        score_bg.fill((0, 0, 0, 128))
-        self.screen.blit(score_bg, (0, 0))
-        self.screen.blit(score_text, (10, 10))
-        self.screen.blit(restart_text, (10, 40))
+            # Calculate height based on whether we're showing combo or hint
+            score_bg_height = 100 if self.combo_count >= 2 else 120
+            score_bg = pygame.Surface((240, score_bg_height), pygame.SRCALPHA)
+            score_bg.fill((0, 0, 0, 128))
+            self.screen.blit(score_bg, (0, 0))
+            self.screen.blit(score_text, (10, 10))
+            self.screen.blit(restart_text, (10, 40))
 
-        if self.combo_count >= 2:
-            combo_text = self.font.render(f"Combo: {self.combo_count}x", True, YELLOW)
-            self.screen.blit(combo_text, (10, 70))
+            if self.combo_count >= 2:
+                combo_text = self.font.render(f"Combo: {self.combo_count}x", True, YELLOW)
+                self.screen.blit(combo_text, (10, 70))
+            else:
+                # Show combo hint when no combo is active with a smaller font
+                hint_font = pygame.font.Font(None, 24) 
+                line1 = hint_font.render("Catch the same fruit", True, WHITE)
+                line2 = hint_font.render("to increase combo!", True, WHITE)
+                self.screen.blit(line1, (10, 70))
+                self.screen.blit(line2, (10, 92))
 
-        if self.combo_bonus > 0:
-            bonus_text = self.font.render(f"+{self.combo_bonus} COMBO BONUS!", True, YELLOW)
-            bonus_x = SCREEN_WIDTH//2 - bonus_text.get_width()//2
-            bonus_y = SCREEN_HEIGHT//2 - 100
-            bonus_bg = pygame.Surface((bonus_text.get_width() + 20, 40), pygame.SRCALPHA)
-            bonus_bg.fill((0, 0, 0, 160))
-            self.screen.blit(bonus_bg, (bonus_x - 10, bonus_y - 5))
-            self.screen.blit(bonus_text, (bonus_x, bonus_y))
+            # Show combo bonus message for 2 seconds after it's been set
+            current_time = pygame.time.get_ticks()
+            if self.combo_bonus > 0 and (current_time - self.combo_bonus_time) < 2000:
+                bonus_text = self.font.render(f"+{self.combo_bonus} COMBO BONUS!", True, YELLOW)
+                bonus_x = SCREEN_WIDTH//2 - bonus_text.get_width()//2
+                bonus_y = SCREEN_HEIGHT//2 - 100
+                bonus_bg = pygame.Surface((bonus_text.get_width() + 20, 40), pygame.SRCALPHA)
+                bonus_bg.fill((0, 0, 0, 160))
+                self.screen.blit(bonus_bg, (bonus_x - 10, bonus_y - 5))
+                self.screen.blit(bonus_text, (bonus_x, bonus_y))
 
-        lives_bg = pygame.Surface((150, 40), pygame.SRCALPHA)
-        lives_bg.fill((0, 0, 0, 128))
-        self.screen.blit(lives_bg, (SCREEN_WIDTH - 150, 0))
-        self.screen.blit(lives_text, (SCREEN_WIDTH - 140, 10))
+            lives_bg = pygame.Surface((150, 40), pygame.SRCALPHA)
+            lives_bg.fill((0, 0, 0, 128))
+            self.screen.blit(lives_bg, (SCREEN_WIDTH - 150, 0))
+            self.screen.blit(lives_text, (SCREEN_WIDTH - 140, 10))
+        elif self.state == GameState.MENU:
+            self.draw_menu()
+        elif self.state == GameState.GAME_OVER:
+            self.all_sprites.draw(self.screen)
+            self.draw_game_over()
+            
         pygame.display.flip()
 
     def draw_menu(self):
