@@ -7,18 +7,31 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
         self.game = game
-        try:
-            self.image = pygame.image.load('images/basket.png').convert_alpha()
-            self.image = pygame.transform.scale(self.image, (100, 60))
-        except:
-            # Fallbac if image loading fails
+        self.basket_type = 0
+
+        self.basket_width = 80
+        self.basket_height = 60
+
+        # Load spritesheet if not already loaded
+        if not hasattr(game, 'basket_sheet'):
+            try:
+                game.basket_sheet = Spritesheet(os.path.join('images', 'baskets_spritesheet.png'))
+            except:
+                game.basket_sheet = None
+
+        if game.basket_sheet:
+            self.image = self.get_basket()
+        else:
             self.image = pygame.Surface((100, 60), pygame.SRCALPHA)
             pygame.draw.rect(self.image, BLUE, (0, 0, 100, 60), 2)
-            
+
         self.rect = self.image.get_rect()
         self.rect.centerx = game.screen.get_width() // 2
         self.rect.bottom = game.screen.get_height() - 10
         self.speedx = 0
+
+    def get_basket(self):
+        return self.game.basket_sheet.get_image(self.basket_width * self.basket_type, 90, self.basket_width, self.basket_height, 1.5)
 
     def update(self):
         self.speedx = 0
@@ -35,6 +48,12 @@ class Player(pygame.sprite.Sprite):
             self.rect.left = 0
         if self.rect.right > self.game.screen.get_width():
             self.rect.right = self.game.screen.get_width()
+
+    def upgrade(self):
+        if self.basket_type < 2:
+            self.basket_type += 1
+
+        self.image = self.get_basket()
 
 
 class Fruit(pygame.sprite.Sprite):

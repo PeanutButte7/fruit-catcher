@@ -202,6 +202,13 @@ class Game:
                 self.combo_bonus = 0
             self.score += points
 
+            if self.score >= 500 and self.player.basket_type == 0:
+                self.player.upgrade()
+
+            if self.score >= 1000 and self.player.basket_type == 1:
+                self.player.upgrade()
+
+
         hits = pygame.sprite.spritecollide(self.player, self.bombs, True)
         for hit in hits:
             explosion = Explosion(hit.rect.centerx, hit.rect.centery, self.explosion_frames)
